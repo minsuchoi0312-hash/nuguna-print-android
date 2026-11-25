@@ -1,0 +1,10 @@
+node_modules/
+.project_id
+.github_repo
+.env
+.env.*
+
+# 안드로이드 사본 빌드 결과물 (다시 만들 수 있음)
+dist-android/
+*.apk
+android/app/src/main/assets/public/

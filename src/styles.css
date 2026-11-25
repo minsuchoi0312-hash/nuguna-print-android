@@ -1,0 +1,1891 @@
+@import "tailwindcss";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+
+/* ════════════════════════════════════════════════════════════════════
+   디자인 기준
+   · 토스 TDS — 색(그레이 · 토스 블루), 서체(Pretendard), 버튼 크기 · 라운드, 누름 효과
+   · 애플 — SF 계열 폰트 폴백, 큰 제목일수록 좁히는 자간, 반투명 유리 · 원형 아이콘 버튼
+   · 당근 SEED — 테두리 대신 표면 명도로 층 나누기, 성공 · 주의 · 오류 색
+   ════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Hiragino Sans", "PingFang SC", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Gowun Batang", "Pretendard Variable", serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-bg: #17171c;
+  --color-elevated: #202027;
+  --color-subtle: #2c2c35;
+  --color-fg: #ffffff;
+  --color-muted: #c3c3c6;
+  --color-faint: #9e9ea4;
+  --color-line: #3c3c47;
+  --color-accent: #3485fa;
+  --color-accent-fg: #ffffff;
+  --color-paper: #ffffff;
+  --color-ink: #ffffff;
+  --color-navy: #202027;
+  --color-ok: #35ce9a;
+  --color-warn: #ff9e65;
+  --color-bad: #ff6e60;
+  --color-swatch-c: #1d4e89;
+  --color-swatch-m: #8d2f45;
+  --color-swatch-y: #8a7428;
+
+  --bg: #17171c;
+  --surface: #202027;
+  --surface-elevated: #2c2c35;
+  --border: #3c3c47;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c3c6;
+  --text-muted: #9e9ea4;
+  --input-bg: #2c2c35;
+  --input-text: #ffffff;
+  --input-placeholder: #7e7e87;
+  --input-border: #3c3c47;
+  --accent: #3485fa;
+}
+
+/* 어두운 테마 — 토스 TDS 다크 (background → layered → float 순으로 밝아진다) */
+:root,
+html[data-theme="dark"] {
+  --color-bg: #17171c;
+  --color-elevated: #202027;
+  --color-subtle: #2c2c35;
+  --color-fg: #ffffff;
+  --color-muted: #c3c3c6;
+  --color-faint: #9e9ea4;
+  --color-line: #3c3c47;
+  --color-accent: #3485fa;
+  --color-accent-fg: #ffffff;
+  --color-paper: #ffffff;
+  --color-ink: #ffffff;
+  --color-navy: #202027;
+  --color-ok: #35ce9a;
+  --color-warn: #ff9e65;
+  --color-bad: #ff6e60;
+  --bg: #17171c;
+  --surface: #202027;
+  --surface-elevated: #2c2c35;
+  --border: #3c3c47;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c3c6;
+  --text-muted: #9e9ea4;
+  --input-bg: #2c2c35;
+  --input-text: #ffffff;
+  --input-placeholder: #7e7e87;
+  --input-border: #3c3c47;
+  --accent: #3485fa;
+  --accent-hover: #2272eb;
+  --chip-border: #3c3c47;
+  --chip-text: #ffffff;
+  --focus-ring: #3485fa;
+  --soft: rgb(255 255 255 / 0.06);
+  /* 카드 안 채움 표면 · 눌림 · 떠오르는 표면 */
+  --fill: rgb(255 255 255 / 0.07);
+  --press: rgb(255 255 255 / 0.1);
+  --raised: #4d4d59;
+  --float: #2c2c35;
+  --shadow-float: 0 12px 32px rgb(0 0 0 / 0.45), 0 2px 6px rgb(0 0 0 / 0.3);
+  /* 모션 (TDS) */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}
+
+/* 밝은 테마 — 토스 회색 바탕(grey-100) 위 흰 카드, 글자는 grey-900 */
+html[data-theme="light"] {
+  --color-bg: #f2f4f6;
+  --color-elevated: #ffffff;
+  --color-subtle: #e5e8eb;
+  --color-fg: #191f28;
+  --color-muted: #4e5968;
+  --color-faint: #6b7684;
+  --color-line: #e5e8eb;
+  --color-accent: #3182f6;
+  --color-accent-fg: #ffffff;
+  --color-paper: #191f28;
+  --color-ink: #191f28;
+  --color-navy: #191f28;
+  /* 의미 색 — 당근 SEED (green-800 · carrot-800 · red-800) */
+  --color-ok: #00745f;
+  --color-warn: #b93901;
+  --color-bad: #ca1d13;
+  --bg: #f2f4f6;
+  --surface: #ffffff;
+  --surface-elevated: #f9fafb;
+  --border: #e5e8eb;
+  --text-primary: #191f28;
+  --text-secondary: #4e5968;
+  --text-muted: #6b7684;
+  --input-bg: #f2f4f6;
+  --input-text: #191f28;
+  --input-placeholder: #8b95a1;
+  --input-border: #e5e8eb;
+  --accent: #3182f6;
+  --accent-hover: #1b64da;
+  --chip-border: #e5e8eb;
+  --chip-text: #191f28;
+  --focus-ring: #3182f6;
+  --soft: #f2f4f6;
+  --fill: #f2f4f6;
+  --press: rgb(0 0 0 / 0.05);
+  --raised: #ffffff;
+  --float: #ffffff;
+  --shadow-float: 0 12px 32px rgb(0 27 55 / 0.1), 0 2px 6px rgb(0 27 55 / 0.06);
+  color-scheme: light;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  html {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    color-scheme: dark;
+    word-break: keep-all;
+  }
+
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: var(--font-sans);
+    letter-spacing: -0.012em;
+    font-optical-sizing: auto;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  /* 마우스·터치로 누를 때 생기는 테두리는 없애고, 키보드 이동(:focus-visible)일 때만 링을 보인다 */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  button:focus-visible,
+  summary:focus-visible,
+  a:focus-visible,
+  [role="tab"]:focus-visible {
+    outline: 2px solid var(--focus-ring, var(--color-accent));
+    outline-offset: 2px;
+  }
+
+  [role="tab"]:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+/* ───────── 타이포 — 크기 · 굵기는 토스, 자간은 애플처럼 클수록 좁게 ───────── */
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.027em;
+}
+
+/* 상단바 — 애플식 큰 제목 + 반투명 유리, 위에 붙어 따라온다 */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 60px;
+  margin: -20px -16px 0;
+  padding: 10px 16px 6px 20px;
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+@media (min-width: 640px) {
+  .app-header {
+    margin-top: -32px;
+    padding-top: 18px;
+  }
+}
+
+.app-header h1 {
+  font-size: clamp(24px, 7.2vw, 28px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.032em;
+}
+
+/* 제목 = 홈 버튼 */
+.home-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  margin-left: -6px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  transition: background-color 120ms var(--ease), transform 120ms var(--ease);
+}
+
+.home-link:active:not(:disabled) {
+  background: var(--press);
+  transform: scale(0.98);
+}
+
+.home-link-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+
+/* 상단바 아이콘은 테두리 · 바탕 없이 아이콘만 (누를 때만 옅은 바탕) */
+.app-header .icon-btn,
+html[data-theme="light"] .app-header .icon-btn {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.app-header .icon-btn:hover,
+html[data-theme="light"] .app-header .icon-btn:hover,
+.app-header .icon-btn[aria-expanded="true"] {
+  background: var(--press);
+}
+
+.app-sub {
+  margin-top: -14px;
+  padding-inline: 4px;
+}
+
+.app-sub p {
+  overflow-wrap: anywhere;
+}
+
+/* 카드 머리글 — 토스 list-header: 제목 + 오른쪽 아이콘 버튼 */
+.card-head {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+/* 아이콘만 있는 버튼 — 40px 누름 영역, 바탕 없음 */
+.ghost-btn {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--text-primary);
+  transition: background-color 120ms var(--ease), transform 120ms var(--ease);
+}
+
+.ghost-btn:hover {
+  background: var(--press);
+}
+
+.ghost-btn:active {
+  transform: scale(0.94);
+  background: var(--press);
+}
+
+/* 연결 방식 아이콘 칩 + 상태 점 (토스 list-row 아바타) */
+.link-avatar {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.link-avatar-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2.5px solid var(--surface);
+}
+
+/* 문서 종류 행 — 토스 list-row + 애플 설정 앱 색 아이콘 */
+.doc-row {
+  display: flex;
+  width: 100%;
+  min-height: 64px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 8px;
+  border-radius: 16px;
+  text-align: left;
+  transition: background-color 120ms var(--ease), transform 120ms var(--ease);
+}
+
+.doc-row:hover {
+  background: var(--press);
+}
+
+.doc-row:active {
+  background: var(--press);
+  transform: scale(0.985);
+}
+
+/* 토스 아이콘 칩 — 옅은 색 바탕 + 같은 계열 진한 아이콘 */
+.doc-ico {
+  --tone: var(--accent);
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--tone);
+}
+
+/* 종류마다 다른 색 — 토스 레드 · 당근 그린 · 당근 주황 · 토스 블루 */
+.doc-ico.is-pdf { --tone: #f04452; }
+.doc-ico.is-photo { --tone: #10ab7d; }
+.doc-ico.is-memo { --tone: #ff7a1a; }
+.doc-ico.is-test { --tone: #3182f6; }
+.doc-ico.is-help { --tone: #8b95a1; }
+
+html:not([data-theme="light"]) .doc-ico {
+  background: color-mix(in srgb, var(--tone) 20%, transparent);
+}
+
+html:not([data-theme="light"]) .doc-ico.is-help { --tone: #9e9ea4; }
+
+/* 오른쪽 화살표 — 작고 연하게 (토스 grey-400) */
+.doc-chev {
+  width: 18px;
+  height: 18px;
+  color: #b0b8c1;
+}
+
+html:not([data-theme="light"]) .doc-chev {
+  color: #62626d;
+}
+
+/* 맨 아래 도움말 줄 */
+.help-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  background: var(--surface);
+  text-align: left;
+  transition: transform 120ms var(--ease), background-color 120ms var(--ease);
+}
+
+.help-row:active {
+  transform: scale(0.985);
+}
+
+@media (hover: hover) {
+  .help-row:hover {
+    background: color-mix(in srgb, var(--color-fg) 3%, var(--surface));
+  }
+}
+
+/* ───────── 인쇄 옵션 — 토스 설정 화면: 줄 이름 + 분절 버튼 ───────── */
+.opt-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.opt-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.opt-row.is-inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.opt-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--text-secondary);
+}
+
+.opt-note {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* 연결 전이라 아직 못 고르는 줄 — 흐리게만 */
+.opt-row.is-idle .seg,
+.opt-row.is-idle .stepper {
+  opacity: 0.45;
+}
+
+.seg-btn:disabled {
+  cursor: not-allowed;
+}
+
+/* 용지 더보기 — 3열 카드, 이름 + 크기 */
+.paper-more {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  animation: fade-in 200ms var(--ease);
+}
+
+.paper-opt {
+  display: flex;
+  min-height: 60px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 14px;
+  border: 1.5px solid transparent;
+  background: var(--fill);
+  color: var(--text-primary);
+  transition: background-color 200ms var(--ease), border-color 200ms var(--ease), transform 120ms var(--ease);
+}
+
+.paper-opt:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.paper-opt.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+
+.paper-opt-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.paper-opt.is-on .paper-opt-name {
+  color: var(--accent);
+}
+
+.paper-opt-size {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* 장수 캡슐 — − 값 + (토스 numeric-spinner) */
+.stepper {
+  display: inline-flex;
+  height: 44px;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--fill);
+}
+
+.stepper button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--text-primary);
+  transition: background-color 120ms var(--ease), transform 120ms var(--ease);
+}
+
+.stepper button:not(:disabled):active {
+  background: var(--press);
+  transform: scale(0.92);
+}
+
+.stepper button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.stepper-value {
+  min-width: 36px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+/* 인쇄 경로 배지 — 토스 badge (옅은 블루) */
+.route-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding-inline: 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* 문서 타일 아이콘 칩 */
+.tile-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+html[data-theme="light"] .tile-icon {
+  background: #ffffff;
+}
+
+.text-xs {
+  letter-spacing: -0.004em;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+/* 숫자는 고정폭 — 장수 · 쪽 · 퍼센트가 흔들리지 않게 (토스 tabular-nums) */
+input[inputmode="decimal"],
+input[inputmode="numeric"],
+input[type="number"],
+.page-cell,
+.toner-row {
+  font-variant-numeric: tabular-nums;
+}
+
+.shell {
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+}
+
+/* ───────── 표면 — 테두리 없이 명도로 층을 나눈다 ───────── */
+.panel {
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 0;
+}
+
+.card {
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 0;
+  border-radius: 24px;
+}
+
+.tile {
+  background: var(--fill);
+  color: var(--text-primary);
+  border: 0;
+  border-radius: 20px;
+  transition: transform 120ms var(--ease), background-color 200ms var(--ease);
+}
+
+button.tile:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  button.tile:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 9%, var(--fill));
+  }
+}
+
+/* 카드 안 아이콘은 강조색 (토스 아이콘 칩) */
+.tile > svg:first-child {
+  color: var(--accent);
+}
+
+/* ───────── 입력 — 토스 text-field: 회색 채움 → 포커스 시 1.5px 블루 ───────── */
+.field {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid transparent;
+  caret-color: var(--accent);
+  transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease), background-color 200ms var(--ease);
+}
+
+html[data-theme="light"] .field {
+  border-color: var(--input-border);
+}
+
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 0.5px var(--accent);
+  background: var(--surface);
+}
+
+.field::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+
+.field:-webkit-autofill,
+.field:-webkit-autofill:hover,
+.field:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--input-text);
+  caret-color: var(--input-text);
+  box-shadow: 0 0 0 1000px var(--input-bg) inset;
+  transition: background-color 9999s ease-out;
+}
+
+.ip-join {
+  display: flex;
+  align-items: stretch;
+}
+
+.ip-join .field {
+  border-radius: 14px 0 0 14px;
+  border-right: 0;
+}
+
+.ip-join button {
+  border-radius: 0 14px 14px 0;
+  background: var(--accent);
+  color: var(--color-accent-fg);
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ip-join button:active:not(:disabled) {
+  box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.14);
+}
+
+/* 연결 상태 점 */
+.dot-usb { background: var(--color-ok); }
+.dot-wifi { background: var(--accent); }
+.dot-helper { background: #9f84fb; }
+.dot-idle { background: var(--color-faint); }
+
+/* ───────── 버튼 — 토스: 주 버튼은 블루 채움, 보조는 회색 채움 ───────── */
+.btn-solid {
+  background: var(--accent);
+  color: var(--color-accent-fg);
+  -webkit-text-fill-color: var(--color-accent-fg);
+  font-weight: 700;
+  letter-spacing: -0.017em;
+  transition: transform 120ms var(--ease), background-color 120ms var(--ease), opacity 200ms var(--ease);
+}
+
+.btn-solid:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+
+/* 누름 = 덮개 + 살짝 줄어듦 (그림자 아님) */
+.btn-solid:active:not(:disabled),
+.chip:active:not(:disabled):not(.is-on) {
+  transform: scale(0.98);
+}
+
+.btn-solid:active:not(:disabled) {
+  box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.14);
+}
+
+.chip {
+  border: 1px solid transparent;
+  background: var(--fill);
+  color: var(--chip-text);
+  font-weight: 600;
+  transition: transform 120ms var(--ease), background-color 200ms var(--ease), border-color 200ms var(--ease), color 200ms var(--ease);
+}
+
+.chip:not(:disabled):not(.is-on):hover {
+  background: var(--press);
+}
+
+/* 선택된 칩 — 토스처럼 grey-900(다크에선 흰색)으로 뒤집는다 */
+.chip.is-on {
+  border-color: var(--color-fg);
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.chip:disabled {
+  opacity: 0.3;
+}
+
+/* 연결 전이라 아직 못 고르는 줄(양면·장수): 글자는 또렷하게, 점선으로만 "아직"을 알린다 */
+.opt-idle .chip:disabled {
+  opacity: 1;
+  border: 1px dashed var(--color-line);
+  background: transparent;
+  color: var(--color-faint);
+}
+
+/* 원형 아이콘 버튼 — 애플 button-icon-circular */
+.icon-btn {
+  border: 0;
+  background: var(--fill);
+  color: var(--chip-text);
+  transition: transform 120ms var(--ease), background-color 200ms var(--ease);
+}
+
+/* 밝은 테마는 바탕이 회색이라 흰 원으로 띄운다 */
+html[data-theme="light"] .icon-btn {
+  background: var(--surface);
+}
+
+.icon-btn:hover,
+html[data-theme="light"] .icon-btn:hover {
+  background: var(--press);
+}
+
+.icon-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+/* ───────── 세그먼트 — 애플·토스 segmented control ───────── */
+.seg {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--fill);
+}
+
+.seg-btn {
+  display: inline-flex;
+  min-height: 40px;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 10px;
+  padding: 6px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+
+.seg-btn.is-on {
+  background: var(--raised);
+  color: var(--text-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 1px 1px rgb(0 0 0 / 0.06);
+}
+
+@media (max-width: 380px) {
+  .seg-btn svg {
+    display: none;
+  }
+}
+
+html[lang="en"] .seg-btn,
+html[lang="ja"] .seg-btn {
+  font-size: 0.78rem;
+}
+
+/* 문서 종류 탭도 같은 분절 컨트롤 모양 */
+.doc-tabs {
+  background: var(--fill);
+}
+
+.doc-tab {
+  color: var(--text-muted);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+
+.doc-tab.is-on {
+  background: var(--raised);
+  color: var(--text-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 1px 1px rgb(0 0 0 / 0.06);
+}
+
+/* 파일 고르기 — 점선 대신 연한 블루 채움 (토스 weak 버튼) */
+.pick {
+  border: 0;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 700;
+  transition: transform 120ms var(--ease), background-color 200ms var(--ease);
+}
+
+.pick:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.pick:active {
+  transform: scale(0.98);
+}
+
+.preset {
+  min-width: 84px;
+  line-height: 1.25;
+}
+
+/* ───────── 접기 목록 — ▶ 표시 대신 오른쪽 둥근 꺾쇠 (토스·당근 accordion) ───────── */
+details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary::after {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  background: var(--text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform 200ms var(--ease);
+}
+
+details[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+/* 테두리만 있던 접기 상자는 채움 표면으로 */
+details.rounded-2xl,
+details.rounded-xl {
+  border-color: transparent;
+  background: var(--fill);
+}
+
+/* ───────── 안내 · 상자 ───────── */
+.scan-box {
+  border-radius: 16px;
+  background: var(--fill);
+  padding: 12px 14px;
+}
+
+.scan-track {
+  margin-top: 8px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.scan-track span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 200ms var(--ease);
+}
+
+.ip-guide,
+.info-box,
+.faq {
+  background: var(--fill);
+}
+
+.code-pill,
+.log-box {
+  background: var(--fill);
+  border: 0;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+.env-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 0;
+  background: var(--fill);
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.env-badge.is-ok {
+  background: color-mix(in srgb, var(--color-ok) 16%, transparent);
+  color: var(--color-ok);
+}
+
+.env-badge.is-no {
+  background: color-mix(in srgb, var(--color-warn) 16%, transparent);
+  color: var(--color-warn);
+}
+
+.kind-badge {
+  display: inline-block;
+  border-radius: 6px;
+  background: var(--fill);
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* 토스 bottom-info — 연한 블루 바탕 */
+.summary-bar {
+  border: 0;
+  background: color-mix(in srgb, var(--accent) 11%, var(--surface));
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.toast {
+  background: var(--fill);
+  color: var(--text-primary);
+}
+
+.support-sheet {
+  max-height: min(88vh, 760px);
+}
+
+/* 드래그 앤 드롭 */
+.drop-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.drop-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 360px);
+  border: 2px dashed var(--accent);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 32px 20px;
+  text-align: center;
+  box-shadow: var(--shadow-float);
+}
+
+/* 모아찍기 미리보기(메모) */
+.nup-grid {
+  display: grid;
+  gap: 0;
+}
+
+.nup-grid.nup-2 {
+  grid-template-rows: 1fr 1fr;
+}
+
+/* 가로 용지 2쪽 모아찍기: 좌·우 */
+.nup-grid.nup-2.is-land {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.nup-grid.nup-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.nup-cell {
+  overflow: hidden;
+  border: 1px dashed #c9c4b8;
+  color: #1e242b;
+}
+
+/* ───────── 인쇄 · 복사 화면 (기능용 — 디자인 변경 없음) ───────── */
+#print-root {
+  display: none;
+}
+
+#copy-bar {
+  display: none;
+}
+
+body.is-copying {
+  background: #f4efe6;
+}
+
+body.is-copying > *:not(#print-root):not(#copy-bar) {
+  display: none !important;
+}
+
+body.is-copying #copy-bar {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #191f28;
+  color: #ffffff;
+}
+
+body.is-copying #copy-bar p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+body.is-copying #copy-bar button {
+  height: 40px;
+  flex: none;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #191f28;
+  font-weight: 700;
+}
+
+body.is-copying #print-root {
+  display: block;
+  padding: 16px 12px 32px;
+}
+
+body.is-copying .print-page.is-sheet {
+  height: auto;
+  max-height: none;
+  width: min(100%, 680px);
+  margin: 0 auto 16px;
+  background: white;
+  box-shadow: 0 8px 24px rgb(27 42 69 / 12%);
+}
+
+.print-page {
+  padding: 12mm;
+  color: #0f172a;
+  background: white;
+  box-sizing: border-box;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  break-after: avoid;
+  page-break-after: avoid;
+  overflow: hidden;
+  letter-spacing: normal;
+}
+
+.print-page.is-sheet {
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  break-after: page;
+  page-break-after: always;
+}
+
+.print-page.is-sheet:last-child,
+.print-page.is-sheet.is-last {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.print-kicker {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.print-page h1 {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: normal;
+}
+
+.print-page p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.print-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.help-card {
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 0;
+}
+
+/* ───────── 미리보기 무대 ───────── */
+.preview-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  overflow: visible;
+  border-radius: 20px;
+  border: 0;
+  background: var(--fill);
+  padding: 14px 12px 28px;
+}
+
+.preview-stage .preview-caption {
+  color: var(--text-secondary);
+}
+
+.preview-pager {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding-bottom: 6px;
+}
+
+button.btn-send:disabled {
+  background: var(--color-subtle);
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.preview-caption,
+.on-paper {
+  color: #191f28;
+}
+
+.paper-btn {
+  height: 40px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--fill);
+  color: var(--text-primary);
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease);
+}
+
+.paper-btn.is-on {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.sheet-a4 {
+  width: min(100%, 200px);
+  max-height: 52vh;
+  aspect-ratio: 210 / 297;
+  overflow: hidden;
+  border: 0;
+  background: white;
+  color: #1a2744;
+  box-shadow: 0 10px 24px rgba(0, 27, 55, 0.14);
+  letter-spacing: normal;
+}
+
+.sheet-a4.is-land {
+  width: min(100%, 290px);
+  aspect-ratio: 297 / 210;
+}
+
+.sheet-a4.a3 {
+  aspect-ratio: 297 / 420;
+}
+
+.sheet-a4.a3.is-land {
+  aspect-ratio: 420 / 297;
+}
+
+.sheet-a4.b5 {
+  aspect-ratio: 182 / 257;
+}
+
+.sheet-a4.b5.is-land {
+  aspect-ratio: 257 / 182;
+}
+
+.sheet-a4.gray,
+.preview-stage.gray .sheet-a4,
+.preview-stage.gray img,
+.preview-stage.gray canvas {
+  filter: grayscale(1);
+}
+
+.print-bars {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.print-bars span {
+  display: block;
+  height: 8px;
+  background: #0f172a;
+}
+
+.print-bars span[data-tone="c"] {
+  background: var(--color-swatch-c);
+}
+
+.print-bars span[data-tone="m"] {
+  background: var(--color-swatch-m);
+}
+
+.print-bars span[data-tone="y"] {
+  background: var(--color-swatch-y);
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  @page a3 {
+    size: A3 portrait;
+    margin: 0;
+  }
+
+  @page b5 {
+    size: 182mm 257mm;
+    margin: 0;
+  }
+
+  @page a5 {
+    size: A5 portrait;
+    margin: 0;
+  }
+
+  @page b4 {
+    size: 257mm 364mm;
+    margin: 0;
+  }
+
+  @page letter {
+    size: letter portrait;
+    margin: 0;
+  }
+
+  @page legal {
+    size: legal portrait;
+    margin: 0;
+  }
+
+  @page a6 {
+    size: 105mm 148mm;
+    margin: 0;
+  }
+
+  @page postcard {
+    size: 100mm 148mm;
+    margin: 0;
+  }
+
+  .paper-a3 {
+    page: a3;
+  }
+
+  .paper-b5 {
+    page: b5;
+  }
+
+  .paper-a5 {
+    page: a5;
+  }
+
+  .paper-b4 {
+    page: b4;
+  }
+
+  .paper-letter {
+    page: letter;
+  }
+
+  .paper-legal {
+    page: legal;
+  }
+
+  .paper-a6 {
+    page: a6;
+  }
+
+  .paper-postcard {
+    page: postcard;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    margin: 0 !important;
+  }
+
+  body.print-gray .print-page {
+    filter: grayscale(1);
+  }
+
+  body.is-printing {
+    background: #fff !important;
+    margin: 0 !important;
+  }
+
+  body.is-printing > *:not(#print-root) {
+    display: none !important;
+  }
+
+  body.is-printing #print-root,
+  body.is-printing .print-page {
+    display: block !important;
+    background: #fff !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.is-printing .print-page {
+    max-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  body.is-printing .print-page.is-sheet:last-child,
+  body.is-printing .print-page.is-sheet.is-last {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  #copy-bar {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* ───────── QR · 프리셋 · 진행 배너 · 연결 확인 ───────── */
+.qr-box {
+  background: #ffffff;
+  border: 0;
+  box-shadow: 0 0 0 1px var(--color-line);
+}
+
+.qr-box svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chip-row {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+.probe-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--color-faint);
+}
+
+.probe-dot.is-on {
+  background: var(--color-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ok) 22%, transparent);
+}
+
+.probe-dot.is-wait {
+  background: var(--accent);
+  animation: probe-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes probe-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.job-card {
+  border: 0;
+  background: color-mix(in srgb, var(--accent) 11%, var(--surface));
+}
+
+.done-card {
+  border: 0;
+  background: color-mix(in srgb, var(--color-ok) 12%, var(--surface));
+}
+
+.thumb-badge {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 62%);
+  padding: 0 4px;
+  font-size: 10px;
+  color: #fff;
+}
+
+.wm-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform: rotate(-35deg);
+  font-size: 22px;
+  font-weight: 700;
+  color: rgb(60 60 60 / 18%);
+  pointer-events: none;
+}
+
+/* ───────── 쪽 그리드 · 사진 액션 · 프리셋 카드 · 확대 ───────── */
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+}
+
+.page-cell {
+  height: 44px;
+}
+
+.preset-card {
+  min-height: 58px;
+  line-height: 1.25;
+}
+
+.preset-card .preset-hint {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.photo-actions .photo-act {
+  display: inline-flex;
+  min-height: 52px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.photo-act.is-danger:not(:disabled) {
+  color: var(--color-bad);
+  background: color-mix(in srgb, var(--color-bad) 10%, transparent);
+}
+
+.thumb-num {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  min-width: 16px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 55%);
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 16px;
+  color: #fff;
+  text-align: center;
+}
+
+/* 주의 — 당근 주황 */
+.warn-box {
+  border: 0;
+  background: color-mix(in srgb, var(--color-warn) 13%, var(--surface));
+  color: var(--color-warn);
+}
+
+.launch-box {
+  border: 0;
+  background: var(--fill);
+}
+
+.zoomable {
+  cursor: zoom-in;
+}
+
+.zoom-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  border: 0;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+
+.zoom-veil {
+  background: rgb(0 0 0 / 92%);
+  color: #ffffff;
+}
+
+.zoom-bar {
+  background: rgb(0 0 0 / 35%);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.zoom-icon,
+.zoom-nav {
+  display: inline-flex;
+  height: 36px;
+  min-width: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 0;
+  background: rgb(255 255 255 / 14%);
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.zoom-icon:disabled,
+.zoom-nav:disabled {
+  opacity: 0.35;
+}
+
+.zoom-sheet {
+  background: #fff;
+  box-shadow: 0 6px 30px rgb(0 0 0 / 45%);
+}
+
+/* ───────── 복사기 상태 · 자가진단 · 사전 점검 · 자가 복구 · 오프라인 ───────── */
+.status-card,
+.backup-box {
+  border: 0;
+  background: var(--fill);
+}
+
+.diag-row {
+  border: 0;
+  background: var(--fill);
+}
+
+.state-badge,
+.diag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.state-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.state-badge.is-ok,
+.diag-badge.is-pass {
+  background: color-mix(in srgb, var(--color-ok) 16%, transparent);
+  color: var(--color-ok);
+}
+
+.state-badge.is-warn,
+.diag-badge.is-warn {
+  background: color-mix(in srgb, var(--color-warn) 16%, transparent);
+  color: var(--color-warn);
+}
+
+.state-badge.is-bad,
+.diag-badge.is-fail {
+  background: color-mix(in srgb, var(--color-bad) 16%, transparent);
+  color: var(--color-bad);
+}
+
+.state-badge.is-idle,
+.diag-badge.is-skip,
+.diag-badge.is-idle {
+  background: var(--fill);
+  color: var(--text-secondary);
+}
+
+.diag-badge.is-run {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  animation: probe-pulse 0.9s ease-in-out infinite;
+}
+
+.diag-total.is-pass {
+  background: color-mix(in srgb, var(--color-ok) 13%, var(--surface));
+  color: var(--text-primary);
+}
+
+.diag-total.is-warn {
+  background: color-mix(in srgb, var(--color-warn) 13%, var(--surface));
+  color: var(--text-primary);
+}
+
+.diag-total.is-fail {
+  background: color-mix(in srgb, var(--color-bad) 13%, var(--surface));
+  color: var(--text-primary);
+}
+
+.toner-track {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-subtle);
+}
+
+.toner-track span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+}
+
+/* 다크 모드에서 검정 토너 막대가 트랙에 묻히지 않게 밝은 테두리 */
+html:not([data-theme="light"]) .toner-track span.is-dark-ink {
+  background: #0b0d10 !important;
+  box-shadow: inset 0 0 0 1.5px #7e7e87;
+}
+
+.toner-row {
+  display: grid;
+  grid-template-columns: minmax(0, 8.5rem) 1fr 2.6rem;
+  align-items: center;
+  gap: 8px;
+}
+
+.cap-chip,
+.reason-chip {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 0;
+  background: var(--fill);
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cap-chip.is-no {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.reason-chip {
+  background: color-mix(in srgb, var(--color-warn) 14%, transparent);
+}
+
+.reason-chip.is-bad {
+  background: color-mix(in srgb, var(--color-bad) 14%, transparent);
+  color: var(--color-bad);
+  font-weight: 700;
+}
+
+.preflight-chip {
+  border: 0;
+  background: var(--fill);
+  color: var(--text-primary);
+}
+
+.preflight-chip.is-warn {
+  background: color-mix(in srgb, var(--color-warn) 13%, transparent);
+}
+
+.preflight-chip.is-bad {
+  background: color-mix(in srgb, var(--color-bad) 13%, transparent);
+  font-weight: 700;
+}
+
+.heal-box {
+  border: 0;
+  background: color-mix(in srgb, var(--accent) 11%, var(--surface));
+}
+
+.offline-badge {
+  border: 0;
+  background: color-mix(in srgb, var(--color-warn) 15%, var(--surface));
+  color: var(--text-primary);
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ───────── 언어 선택 팝오버 — 떠 있는 표면 ───────── */
+.lang-btn {
+  letter-spacing: 0.01em;
+  font-weight: 700;
+}
+
+.lang-pop {
+  border: 0;
+  background: var(--float);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-float);
+}
+
+.lang-item {
+  transition: background-color 120ms var(--ease);
+}
+
+.lang-item:hover,
+.lang-item:focus-visible {
+  background: var(--press);
+  outline: none;
+}
+
+.lang-item.is-on {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* 긴 언어(영어·일본어)에서도 칸 안에서 줄바꿈 */
+.chip,
+.btn-solid,
+.paper-btn {
+  overflow-wrap: anywhere;
+}
+
+.shell,
+.card {
+  min-width: 0;
+}
+
+.current-badge {
+  color: var(--color-ok);
+  background: color-mix(in srgb, var(--color-ok) 15%, transparent);
+  border: 0;
+}
+
+/* 하단 토스트 — 토스 toast: grey-900 표면 + 흰 글자 */
+.toast-dock .toast {
+  background: #191f28;
+  color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgb(0 27 55 / 0.22);
+}
+
+html:not([data-theme="light"]) .toast-dock .toast {
+  background: #4d4d59;
+}
+
+.toast-pop {
+  animation: toast-pop 2s var(--ease) both;
+}
+
+@keyframes toast-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  10%,
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-pop {
+    animation: none;
+  }
+}
+
+/* ───────── Tailwind 테두리 유틸리티 보정 — 남은 헤어라인도 같은 톤으로 ───────── */
+.border-line {
+  border-color: var(--color-line);
+}
