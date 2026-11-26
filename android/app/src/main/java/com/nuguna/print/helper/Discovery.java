@@ -41,6 +41,29 @@ import java.util.concurrent.TimeUnit;
 public final class Discovery {
     private Discovery() {}
 
+    /* 진행률 — /progress 가 읽어 간다. total = 확인할 주소 수 + 마무리(모델명) 1 단계 */
+    static final java.util.concurrent.atomic.AtomicInteger progDone = new java.util.concurrent.atomic.AtomicInteger();
+    static final java.util.concurrent.atomic.AtomicInteger progTotal = new java.util.concurrent.atomic.AtomicInteger();
+    static volatile boolean progRunning = false;
+    static volatile Map<String, Found> progFound = null;
+
+    public static JSONObject progress() throws Exception {
+        JSONObject o = new JSONObject();
+        int found = 0;
+        Map<String, Found> map = progFound;
+        if (map != null) {
+            synchronized (map) {
+                for (Found f : map.values()) if (f.printerLike()) found++;
+            }
+        }
+        o.put("ok", true);
+        o.put("running", progRunning);
+        o.put("done", progDone.get());
+        o.put("total", progTotal.get());
+        o.put("found", found);
+        return o;
+    }
+
     static final String[] MDNS_SERVICES = {
         "_ipp._tcp.local", "_ipps._tcp.local", "_pdl-datastream._tcp.local", "_printer._tcp.local", "_canon-bjnp1._tcp.local"
     };
@@ -541,6 +564,7 @@ public final class Discovery {
                             f.bjnp |= bjnp;
                         }
                     }
+                    progDone.incrementAndGet();
                 }));
             }
             for (Future<?> j : jobs) {
@@ -576,6 +600,10 @@ public final class Discovery {
                     if (local == null || !h.equals(local.address)) hosts.add(h);
                 }
             }
+            progDone.set(0);
+            progTotal.set(hosts.size() + 1);
+            progFound = found;
+            progRunning = true;
             ExecutorService side = Executors.newFixedThreadPool(5);
             List<Future<?>> jobs = new ArrayList<>();
             jobs.add(side.submit(() -> mdns(local, found, 2200)));
@@ -624,6 +652,8 @@ public final class Discovery {
             res.put("phone", true);
             return res;
         } finally {
+            progDone.set(progTotal.get());
+            progRunning = false;
             if (lock != null) {
                 try {
                     lock.release();

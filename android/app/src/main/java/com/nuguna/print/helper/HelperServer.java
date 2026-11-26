@@ -210,6 +210,10 @@ public final class HelperServer {
                 send(out, 200, info());
                 return;
             }
+            case "/progress": {
+                send(out, 200, Discovery.progress());
+                return;
+            }
             case "/discover": {
                 String subnet = val(req, "subnet").trim();
                 if (!subnet.isEmpty() && (!subnet.matches("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$") || !Net.isPrivate(subnet + ".1"))) {
