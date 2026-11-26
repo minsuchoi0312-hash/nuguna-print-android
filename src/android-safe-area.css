@@ -1,0 +1,44 @@
+/*
+ * 앱(APK) 전용 — 안드로이드 15+ 전체화면(edge-to-edge)에서 상태바 · 하단 제스처 바에 화면이 가리지 않게.
+ * Capacitor SystemBars가 --safe-area-inset-* 값을 넣어 주고, 없으면 env() 값을 쓴다.
+ * build-apk.ps1은 원본에 없는 이 파일을 덮어쓰지 않는다.
+ */
+:root {
+  --app-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --app-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+}
+
+/* 본문: 상태바만큼 내리고, 아래는 제스처 바만큼 띄운다 */
+.shell {
+  padding-top: calc(16px + var(--app-top)) !important;
+  padding-bottom: calc(2rem + var(--app-bottom)) !important;
+}
+
+/* 상단바: 유리 바탕은 상태바 뒤까지 깔고, 내용은 상태바 아래에서 시작 */
+.app-header,
+html .app-header {
+  margin-top: calc(-16px - var(--app-top)) !important;
+  padding-top: calc(12px + var(--app-top)) !important;
+  padding-bottom: 8px;
+  min-height: calc(64px + var(--app-top));
+}
+
+/* 큰 제목을 폰 폭에 맞게 살짝 줄인다 */
+.app-header h1 {
+  font-size: clamp(22px, 6.6vw, 26px);
+}
+
+/* 전체화면 확대 보기 · 아래에서 올라오는 시트도 상태바 · 제스처 바를 피한다 */
+.zoom-veil {
+  padding-top: var(--app-top);
+  padding-bottom: var(--app-bottom);
+}
+
+.fixed.inset-0.items-end {
+  padding-top: calc(12px + var(--app-top));
+  padding-bottom: calc(12px + var(--app-bottom));
+}
+
+.toast-dock {
+  bottom: calc(20px + var(--app-bottom)) !important;
+}

@@ -1,4 +1,4 @@
-# 누구나프린트 안드로이드 APK 만들기 (사본 전용)
+﻿# 누구나프린트 안드로이드 APK 만들기 (사본 전용)
 # 1) 원본의 최신 화면 코드(src, public)를 이 사본으로 가져온다 — 원본은 읽기만 한다
 # 2) 화면 빌드 → Capacitor 동기화 → Gradle로 테스트용(debug) APK
 # 사용: PowerShell에서  powershell -ExecutionPolicy Bypass -File C:\dev\nuguna-print-android\build-apk.ps1
