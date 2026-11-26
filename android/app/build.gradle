@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+/* 정식 서명 키: 저장소 밖(C:/dev/nuguna-print-keystore)에 둔다. 없으면 release 빌드는 서명 없이 만들어진다 */
+def keystoreProps = new Properties()
+def keystoreFile = file('C:/dev/nuguna-print-keystore/keystore.properties')
+if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
+
 android {
     namespace = "com.nuguna.print"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +12,9 @@ android {
         applicationId "com.nuguna.print"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        /* 릴리스마다 올린다 (스토어 업데이트는 versionCode가 커야 받아 준다): 3.2 → 32 */
+        versionCode 32
+        versionName "3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +22,20 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (keystoreProps['storeFile']) {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (keystoreProps['storeFile']) signingConfig signingConfigs.release
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

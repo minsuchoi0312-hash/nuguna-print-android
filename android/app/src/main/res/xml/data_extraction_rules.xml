@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 안드로이드 12 이상: 클라우드 백업과 기기 간 이전(새 폰으로 옮기기) 모두에서 앱 데이터를 빼낸다.
+     allowBackup="false" 만으로는 기기 간 이전이 막히지 않는다. 개인정보처리방침 "기기 백업으로도 복사되지 않아요"와 맞춘다. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+    </device-transfer>
+</data-extraction-rules>

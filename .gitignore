@@ -8,3 +8,9 @@ node_modules/
 dist-android/
 *.apk
 android/app/src/main/assets/public/
+
+# 정식 빌드 결과물 · 서명 키(저장소 밖에 둔다)
+*.aab
+*.jks
+*.keystore
+keystore.properties
