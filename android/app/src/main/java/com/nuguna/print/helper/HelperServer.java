@@ -49,17 +49,53 @@ public final class HelperServer {
         Net.init(this.ctx);
     }
 
+    private volatile boolean retrying;
+
     public synchronized void start() {
         if (server != null && !server.isClosed()) return;
-        try {
-            server = new ServerSocket();
-            server.setReuseAddress(true);
-            server.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), PORT), 16);
-        } catch (IOException e) {
-            Log.w(TAG, "helper port busy", e);
+        if (!bind()) {
+            /* 앱을 닫았다 바로 열면 이전 프로세스의 포트가 잠깐 남아 있다 → 15초 동안 다시 시도 */
+            if (retrying) return;
+            retrying = true;
+            pool.execute(() -> {
+                try {
+                    for (int i = 0; i < 30; i++) {
+                        Thread.sleep(500);
+                        synchronized (HelperServer.this) {
+                            if (server != null && !server.isClosed()) return;
+                            if (bind()) {
+                                serve(server);
+                                return;
+                            }
+                        }
+                    }
+                    Log.w(TAG, "helper port still busy");
+                } catch (InterruptedException ignored) {
+                } finally {
+                    retrying = false;
+                }
+            });
             return;
         }
-        final ServerSocket s = server;
+        serve(server);
+    }
+
+    private boolean bind() {
+        ServerSocket s = null;
+        try {
+            s = new ServerSocket();
+            s.setReuseAddress(true);
+            s.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), PORT), 16);
+            server = s;
+            return true;
+        } catch (IOException e) {
+            Net.closeQuietly(s);
+            Log.w(TAG, "helper port busy: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void serve(final ServerSocket s) {
         pool.execute(() -> {
             while (!s.isClosed()) {
                 try {

@@ -68,8 +68,26 @@ function routeIppThroughHelper(helper: HelperInfo) {
   };
 }
 
-void startPhoneHelper().then((helper) => {
-  if (helper) routeIppThroughHelper(helper);
+/** 내장 도우미가 실제로 답할 때까지 잠깐 기다린다(앱을 닫았다 바로 열면 포트가 몇 초 늦게 열린다) */
+async function waitHelper(helper: HelperInfo, ms = 6000) {
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    try {
+      const res = await fetch(`${helper.url}/ping`, { cache: "no-store" });
+      if (res.ok) return true;
+    } catch {
+      /* 아직 안 열림 */
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+  return false;
+}
+
+void startPhoneHelper().then(async (helper) => {
+  if (helper) {
+    routeIppThroughHelper(helper);
+    await waitHelper(helper);
+  }
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <AtlasApp />
