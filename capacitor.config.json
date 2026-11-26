@@ -8,7 +8,6 @@
     "cleartext": true
   },
   "android": {
-    "allowMixedContent": true,
     "backgroundColor": "#17171C"
   },
   "plugins": {

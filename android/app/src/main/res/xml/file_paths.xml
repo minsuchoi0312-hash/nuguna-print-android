@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider가 내줄 수 있는 범위: 앱 캐시 폴더만 (외부 저장소 전체를 가리키지 않게) -->
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <external-path name="my_images" path="." />
     <cache-path name="my_cache_images" path="." />
 </paths>

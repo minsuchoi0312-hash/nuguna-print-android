@@ -23,6 +23,10 @@ public final class SharedInbox {
 
     static final int MAX_FILES = 20;
 
+    /* 받는 파일 종류: 사진(jpeg · png · webp · gif · heic · bmp) · PDF · 글. SVG처럼 스크립트를 품을 수 있는 형식은 뺀다 */
+    static final java.util.regex.Pattern ALLOWED_MIME = java.util.regex.Pattern.compile(
+        "^(image/(jpeg|jpg|png|webp|gif|heic|heif|bmp)|application/pdf|text/plain)$");
+
     static final class Item {
         final Uri uri;
         final String name;
@@ -61,8 +65,15 @@ public final class SharedInbox {
             if (next.size() >= MAX_FILES) break;
             /* 다른 앱의 content:// 만 받는다 (file:// 로 우리 앱 내부 파일을 읽히는 것 방지) */
             if (u == null || !ContentResolver.SCHEME_CONTENT.equals(u.getScheme())) continue;
+            /* 우리 앱 자신의 파일 주소(FileProvider 등)는 받지 않는다 — 다른 앱이 공유로 우리 내부 파일을 열게 하는 것 방지 */
+            String authority = u.getAuthority();
+            if (authority == null || authority.startsWith(ctx.getPackageName())) continue;
             String mime = cr.getType(u);
             if (mime == null) mime = intent.getType() == null ? "" : intent.getType();
+            /* 파일 종류는 공유한 앱이 알려 주는 값이라 그대로 믿지 않는다: 소문자 정규화 + 허용 목록만 (응답 헤더에 들어간다) */
+            int semi = mime.indexOf(';');
+            mime = (semi >= 0 ? mime.substring(0, semi) : mime).trim().toLowerCase(java.util.Locale.US);
+            if (!ALLOWED_MIME.matcher(mime).matches()) continue;
             String name = "shared";
             long size = -1;
             try (Cursor c = cr.query(u, new String[] {OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE}, null, null, null)) {
@@ -74,7 +85,6 @@ public final class SharedInbox {
                 }
             } catch (Exception ignored) {
             }
-            if (!(mime.startsWith("image/") || mime.equals("application/pdf") || mime.equals("text/plain"))) continue;
             next.add(new Item(u, Net.clean(name, 120), mime, size));
         }
         if (next.isEmpty()) return false;

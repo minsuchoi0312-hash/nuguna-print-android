@@ -24,6 +24,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 폰 안의 "PC 도우미" — PC용 raw-print-helper.mjs 와 같은 주소 · 같은 응답.
@@ -37,10 +41,17 @@ public final class HelperServer {
     private static final String TAG = "NugunaHelper";
     private static final long MAX_BYTES = 120L * 1024 * 1024;
     private static final long MAX_IPP_BYTES = 48L * 1024 * 1024;
+    /* 공유 파일은 통째로 메모리에 담아 넘기므로 낮게 — 120MB를 담으면 앱이 메모리 부족으로 꺼질 수 있다 */
+    private static final long MAX_SHARED_BYTES = 48L * 1024 * 1024;
+    /* 동시에 처리하는 요청 수 상한 — 다른 앱이 연결을 잔뜩 열어도 앱이 멈추지 않게 (넘치면 바로 끊는다) */
+    private static final int MAX_CLIENTS = 24;
 
     private final Context ctx;
     private final String code;
+    /* 서버 루프 · 포트 재시도용 */
     private final ExecutorService pool = Executors.newCachedThreadPool();
+    /* 요청 처리용 — 크기가 정해진 풀 */
+    private final ThreadPoolExecutor workers = new ThreadPoolExecutor(2, MAX_CLIENTS, 30, TimeUnit.SECONDS, new SynchronousQueue<>());
     private final ArrayDeque<Long> fails = new ArrayDeque<>();
     private ServerSocket server;
 
@@ -101,7 +112,11 @@ public final class HelperServer {
             while (!s.isClosed()) {
                 try {
                     final Socket client = s.accept();
-                    pool.execute(() -> handle(client));
+                    try {
+                        workers.execute(() -> handle(client));
+                    } catch (RejectedExecutionException full) {
+                        Net.closeQuietly(client);
+                    }
                 } catch (IOException e) {
                     if (s.isClosed()) return;
                 }
@@ -342,7 +357,7 @@ public final class HelperServer {
         send(out, sent == req.length ? 200 : 502, o);
     }
 
-    /** 공유로 받은 파일 하나를 그대로 흘려 보낸다 (크기 상한 MAX_BYTES) */
+    /** 공유로 받은 파일 하나를 그대로 흘려 보낸다 (크기 상한 MAX_SHARED_BYTES) */
     private void sharedFile(Req req, OutputStream out) throws Exception {
         int b, i;
         try {
@@ -363,7 +378,7 @@ public final class HelperServer {
             byte[] chunk = new byte[65536];
             int n;
             while ((n = in.read(chunk)) > 0) {
-                if (buf.size() + n > MAX_BYTES) {
+                if (buf.size() + n > MAX_SHARED_BYTES) {
                     send(out, 413, err("payload too large"));
                     return;
                 }
