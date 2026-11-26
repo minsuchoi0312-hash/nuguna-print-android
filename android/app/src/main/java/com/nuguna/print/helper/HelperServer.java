@@ -59,6 +59,7 @@ public final class HelperServer {
         this.ctx = ctx.getApplicationContext();
         this.code = code;
         Net.init(this.ctx);
+        NativePdf.cleanStale(this.ctx);
     }
 
     private volatile boolean retrying;

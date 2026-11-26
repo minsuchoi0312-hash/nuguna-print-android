@@ -62,6 +62,19 @@ final class NativePdf {
     private static final Map<String, Doc> docs = new LinkedHashMap<>();
     private static int seq = 0;
 
+    /** 앱이 강제로 꺼져 남은 임시 PDF를 지운다 (도우미가 뜰 때 한 번, 열린 문서가 없을 때만) */
+    static void cleanStale(Context ctx) {
+        synchronized (NativePdf.class) {
+            if (!docs.isEmpty()) return;
+        }
+        File[] files = new File(ctx.getCacheDir(), "native-pdf").listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            //noinspection ResultOfMethodCallIgnored
+            f.delete();
+        }
+    }
+
     /** 본문으로 받은 PDF를 연다. 암호 · 손상으로 못 열면 null */
     static JSONObject open(Context ctx, InputStream body, long length) throws Exception {
         File dir = new File(ctx.getCacheDir(), "native-pdf");
