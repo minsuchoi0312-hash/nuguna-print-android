@@ -36,6 +36,7 @@ public final class HelperServer {
     public static final int PORT = 47631;
     private static final String TAG = "NugunaHelper";
     private static final long MAX_BYTES = 120L * 1024 * 1024;
+    private static final long MAX_IPP_BYTES = 48L * 1024 * 1024;
 
     private final Context ctx;
     private final String code;
@@ -129,10 +130,13 @@ public final class HelperServer {
             OutputStream out = client.getOutputStream();
             Req req = readHead(in);
             if (req == null) return;
+            origin.set(req.headers.get("origin"));
             try {
                 route(req, out);
             } catch (Exception e) {
-                send(out, 502, err(String.valueOf(e.getMessage())));
+                /* 내부 예외 문구는 밖으로 내보내지 않는다 */
+                Log.w(TAG, "request failed: " + e);
+                send(out, 502, err("helper error"));
             }
         } catch (Exception ignored) {
         } finally {
@@ -332,7 +336,8 @@ public final class HelperServer {
 
     /** IPP 요청을 프린터 631 로 전달하고 답을 그대로 돌려준다 */
     private void ipp(Req req, OutputStream out, String host) throws Exception {
-        if (req.length <= 0 || req.length > MAX_BYTES) {
+        /* IPP 는 답을 받으려고 통째로 메모리에 담으니 9100 보다 낮게 제한 (메모리 부족으로 앱이 꺼지지 않게) */
+        if (req.length <= 0 || req.length > MAX_IPP_BYTES) {
             send(out, req.length <= 0 ? 400 : 413, err(req.length <= 0 ? "empty" : "payload too large"));
             return;
         }
@@ -382,12 +387,15 @@ public final class HelperServer {
     }
 
     /* ───────── 보안 · 응답 ───────── */
+    /*
+     * 코드는 96비트 난수라 맞혀 볼 수 없다. 틀린 시도가 많아도 맞는 코드는 늘 통과시킨다
+     * (예전처럼 막으면 폰의 다른 앱 · 웹페이지가 틀린 코드만 보내 앱 인쇄를 멈출 수 있었다).
+     */
     private synchronized boolean codeOk(String given) {
         long now = System.currentTimeMillis();
         while (!fails.isEmpty() && now - fails.peekFirst() > 60_000) fails.pollFirst();
-        if (fails.size() >= 10) return false;
         boolean ok = given != null && MessageDigest.isEqual(given.getBytes(StandardCharsets.UTF_8), code.getBytes(StandardCharsets.UTF_8));
-        if (!ok) fails.addLast(now);
+        if (!ok && fails.size() < 100) fails.addLast(now);
         return ok;
     }
 
@@ -406,8 +414,20 @@ public final class HelperServer {
         return o;
     }
 
-    private static final String CORS = "Access-Control-Allow-Origin: *\r\n"
-        + "Access-Control-Allow-Private-Network: true\r\n"
+    /*
+     * 응답은 앱 화면(WebView, http://localhost)만 읽게 한다. 폰 브라우저의 다른 웹사이트는
+     * 요청을 보내도 답을 읽지 못한다. (Origin 없는 요청은 연결 코드로 막는다)
+     */
+    private static final ThreadLocal<String> origin = new ThreadLocal<>();
+    private static final java.util.Set<String> APP_ORIGINS = new java.util.HashSet<>(java.util.Arrays.asList(
+        "http://localhost", "https://localhost", "capacitor://localhost"));
+
+    private static String allowOrigin() {
+        String o = origin.get();
+        return "Access-Control-Allow-Origin: " + (o != null && APP_ORIGINS.contains(o) ? o : "http://localhost") + "\r\nVary: Origin\r\n";
+    }
+
+    private static final String CORS = "Access-Control-Allow-Private-Network: true\r\n"
         + "Access-Control-Allow-Headers: Content-Type, X-Helper-Code, Access-Control-Request-Private-Network\r\n"
         + "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
         + "Access-Control-Max-Age: 600\r\n";
@@ -419,7 +439,7 @@ public final class HelperServer {
     private static void sendRaw(OutputStream out, int status, String type, byte[] body) throws IOException {
         StringBuilder head = new StringBuilder();
         head.append("HTTP/1.1 ").append(status).append(' ').append(reason(status)).append("\r\n");
-        head.append(CORS);
+        head.append(allowOrigin()).append(CORS);
         if (body != null) {
             head.append("Content-Type: ").append(type).append("\r\n");
             head.append("Content-Length: ").append(body.length).append("\r\n");
