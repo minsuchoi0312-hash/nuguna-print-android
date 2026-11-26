@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">누구나프린트</string>
     <string name="title_activity_main">누구나프린트</string>
+    <string name="share_label">누구나프린트로 인쇄</string>
     <string name="package_name">com.nuguna.print</string>
     <string name="custom_url_scheme">com.nuguna.print</string>
 </resources>

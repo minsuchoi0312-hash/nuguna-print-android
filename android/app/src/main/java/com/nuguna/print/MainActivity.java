@@ -1,5 +1,6 @@
 package com.nuguna.print;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 
@@ -7,6 +8,7 @@ import androidx.activity.OnBackPressedCallback;
 
 import com.getcapacitor.BridgeActivity;
 import com.nuguna.print.helper.PhoneHelperPlugin;
+import com.nuguna.print.helper.SharedInbox;
 
 public class MainActivity extends BridgeActivity {
     @Override
@@ -32,6 +34,19 @@ public class MainActivity extends BridgeActivity {
                     });
             }
         });
+
+        /* 다른 앱에서 '공유 → 누구나프린트'로 열렸으면 파일을 받아 둔다 (화면이 뜨면 스스로 가져간다) */
+        SharedInbox.take(this, getIntent());
+    }
+
+    /** 앱이 이미 켜져 있을 때 공유로 다시 열림 → 받아 두고 화면에 알린다 */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (!SharedInbox.take(this, intent)) return;
+        WebView web = getBridge() == null ? null : getBridge().getWebView();
+        if (web != null) web.evaluateJavascript("(function(){try{window.__nugunaShared && window.__nugunaShared();}catch(e){}})()", null);
     }
 
     /** 이 콜백을 잠깐 끄고 기본 뒤로가기(앱 닫기 · 뒤로 보내기)를 실행 */

@@ -2,6 +2,7 @@
   "appId": "com.nuguna.print",
   "appName": "누구나프린트",
   "webDir": "dist-android",
+  "loggingBehavior": "none",
   "server": {
     "androidScheme": "http",
     "cleartext": true

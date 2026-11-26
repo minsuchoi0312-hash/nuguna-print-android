@@ -218,6 +218,14 @@ public final class HelperServer {
                 send(out, 200, Discovery.progress());
                 return;
             }
+            case "/shared": {
+                send(out, 200, SharedInbox.list());
+                return;
+            }
+            case "/shared/file": {
+                sharedFile(req, out);
+                return;
+            }
             case "/discover": {
                 String subnet = val(req, "subnet").trim();
                 if (!subnet.isEmpty() && (!subnet.matches("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$") || !Net.isPrivate(subnet + ".1"))) {
@@ -332,6 +340,40 @@ public final class HelperServer {
         o.put("ok", sent == req.length);
         o.put("bytes", sent);
         send(out, sent == req.length ? 200 : 502, o);
+    }
+
+    /** 공유로 받은 파일 하나를 그대로 흘려 보낸다 (크기 상한 MAX_BYTES) */
+    private void sharedFile(Req req, OutputStream out) throws Exception {
+        int b, i;
+        try {
+            b = Integer.parseInt(val(req, "batch"));
+            i = Integer.parseInt(val(req, "i"));
+        } catch (NumberFormatException e) {
+            send(out, 400, err("bad index"));
+            return;
+        }
+        SharedInbox.Item item = SharedInbox.get(b, i);
+        if (item == null) {
+            send(out, 404, err("not found"));
+            return;
+        }
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        try (InputStream in = ctx.getContentResolver().openInputStream(item.uri)) {
+            if (in == null) throw new IOException("no stream");
+            byte[] chunk = new byte[65536];
+            int n;
+            while ((n = in.read(chunk)) > 0) {
+                if (buf.size() + n > MAX_BYTES) {
+                    send(out, 413, err("payload too large"));
+                    return;
+                }
+                buf.write(chunk, 0, n);
+            }
+        } catch (SecurityException | IOException e) {
+            send(out, 410, err("file not readable"));
+            return;
+        }
+        sendRaw(out, 200, item.mime, buf.toByteArray());
     }
 
     /** IPP 요청을 프린터 631 로 전달하고 답을 그대로 돌려준다 */

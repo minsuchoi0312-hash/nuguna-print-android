@@ -83,14 +83,51 @@ async function waitHelper(helper: HelperInfo, ms = 6000) {
   return false;
 }
 
+/* ───── 다른 앱의 '공유 → 누구나프린트' ─────
+ * MainActivity 가 받은 파일을 내장 도우미(/shared)에서 꺼내 화면(window.__nugunaOpenFiles)에 넘긴다.
+ * 같은 묶음(batch)을 두 번 열지 않게 이번 실행에서 연 번호를 기억한다. */
+type SharedList = { batch: number; files: { i: number; name: string; mime: string }[] };
+let openedBatch = Number(sessionStorage.getItem("nuguna-shared-batch") || "0");
+
+function screenReady(): Promise<(files: File[]) => void> {
+  const host = window as { __nugunaOpenFiles?: (files: File[]) => void };
+  if (host.__nugunaOpenFiles) return Promise.resolve(host.__nugunaOpenFiles);
+  return new Promise((resolve) => {
+    window.addEventListener("nuguna-files-ready", () => resolve(host.__nugunaOpenFiles!), { once: true });
+  });
+}
+
+async function pullShared(helper: HelperInfo) {
+  try {
+    const headers = { "X-Helper-Code": helper.code };
+    const res = await fetch(`${helper.url}/shared`, { headers, cache: "no-store" });
+    if (!res.ok) return;
+    const list = (await res.json()) as SharedList;
+    if (!list.files?.length || list.batch <= openedBatch) return;
+    openedBatch = list.batch;
+    sessionStorage.setItem("nuguna-shared-batch", String(list.batch));
+    const files: File[] = [];
+    for (const f of list.files) {
+      const one = await fetch(`${helper.url}/shared/file?batch=${list.batch}&i=${f.i}`, { headers, cache: "no-store" });
+      if (!one.ok) continue;
+      files.push(new File([await one.blob()], f.name || "shared", { type: f.mime }));
+    }
+    if (files.length) (await screenReady())(files);
+  } catch {
+    /* 공유 파일을 못 읽어도 앱은 평소처럼 연다 */
+  }
+}
+
 void startPhoneHelper().then(async (helper) => {
   if (helper) {
     routeIppThroughHelper(helper);
     await waitHelper(helper);
+    (window as { __nugunaShared?: () => void }).__nugunaShared = () => void pullShared(helper);
   }
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <AtlasApp />
     </StrictMode>,
   );
+  if (helper) void pullShared(helper);
 });
