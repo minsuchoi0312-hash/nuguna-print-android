@@ -530,12 +530,15 @@ public final class Discovery {
                     boolean raw = Net.portOpen(host, 9100, timeoutMs);
                     boolean ipp = Net.portOpen(host, 631, timeoutMs);
                     boolean lpd = !raw && !ipp && Net.portOpen(host, 515, timeoutMs);
-                    if (raw || ipp || lpd) {
+                    /* 캐논 PIXMA 는 9100 · 631 없이 BJNP(TCP 8611) 만 여는 경우가 많다 */
+                    boolean bjnp = !raw && !ipp && Net.portOpen(host, Bjnp.PORT, timeoutMs);
+                    if (raw || ipp || lpd || bjnp) {
                         synchronized (out) {
                             Found f = row(out, host);
                             f.raw9100 |= raw;
                             f.ipp |= ipp;
                             f.lpd |= lpd;
+                            f.bjnp |= bjnp;
                         }
                     }
                 }));
@@ -647,6 +650,8 @@ public final class Discovery {
         String model = "";
         String via = null;
         Set<String> langs = new LinkedHashSet<>();
+        /* 캐논: BJNP 로 장치 ID(모델명 · 인쇄 언어)를 묻는다 */
+        if (f.bjnp && f.deviceId.isEmpty()) f.deviceId = Net.clean(Bjnp.deviceId(f.host), 400);
         Map<String, String> id = Probe.parse1284(f.deviceId);
         if (f.ipp) {
             java.util.Map<String, java.util.List<Object>> attrs = Probe.ippAttrs(f.host, new String[] {"printer-make-and-model", "document-format-supported"}, 1800);

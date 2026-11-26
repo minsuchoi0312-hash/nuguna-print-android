@@ -229,7 +229,7 @@ public final class HelperServer {
         } catch (NumberFormatException ignored) {
         }
         boolean ippPath = req.path.equals("/ipp");
-        if (!Net.isPrivate(host) || (!ippPath && (port < 9100 || port > 9102))) {
+        if (!Net.isPrivate(host) || (!ippPath && (port < 9100 || port > 9102) && port != Bjnp.PORT)) {
             send(out, 400, err("target not allowed"));
             return;
         }
@@ -280,6 +280,21 @@ public final class HelperServer {
             JSONObject o = err("payload too large");
             o.put("maxBytes", MAX_BYTES);
             send(out, 413, o);
+            return;
+        }
+        /* 캐논 PIXMA: 9100 대신 BJNP(8611) */
+        if (port == Bjnp.PORT) {
+            long sentBjnp;
+            try {
+                sentBjnp = Bjnp.print(host, req.body, req.length, "nuguna");
+            } catch (IOException e) {
+                send(out, 502, err("printer not reachable"));
+                return;
+            }
+            JSONObject done = new JSONObject();
+            done.put("ok", sentBjnp == req.length);
+            done.put("bytes", sentBjnp);
+            send(out, sentBjnp == req.length ? 200 : 502, done);
             return;
         }
         Socket printer;
