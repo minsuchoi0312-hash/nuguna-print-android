@@ -241,6 +241,40 @@ public final class HelperServer {
                 sharedFile(req, out);
                 return;
             }
+            /* 내장 PDF 엔진(pdfium)으로 쪽 그리기: 글꼴이 안 들어간 한글 PDF도 제대로 */
+            case "/pdf/open": {
+                if (!req.method.equals("POST")) break;
+                if (req.length <= 0 || req.length > NativePdf.MAX_BYTES) {
+                    send(out, req.length <= 0 ? 400 : 413, err(req.length <= 0 ? "empty" : "payload too large"));
+                    return;
+                }
+                JSONObject opened = NativePdf.open(ctx, req.body, req.length);
+                if (opened == null) send(out, 422, err("cannot open pdf"));
+                else send(out, 200, opened);
+                return;
+            }
+            case "/pdf/page": {
+                int index, width, height;
+                try {
+                    index = Integer.parseInt(val(req, "i"));
+                    width = Integer.parseInt(val(req, "w"));
+                    height = Integer.parseInt(val(req, "h"));
+                } catch (NumberFormatException e) {
+                    send(out, 400, err("bad size"));
+                    return;
+                }
+                byte[] png = NativePdf.page(val(req, "id"), index, width, height);
+                if (png == null) send(out, 404, err("no page"));
+                else sendRaw(out, 200, "image/png", png);
+                return;
+            }
+            case "/pdf/close": {
+                NativePdf.close(val(req, "id"));
+                JSONObject o = new JSONObject();
+                o.put("ok", true);
+                send(out, 200, o);
+                return;
+            }
             case "/discover": {
                 String subnet = val(req, "subnet").trim();
                 if (!subnet.isEmpty() && (!subnet.matches("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$") || !Net.isPrivate(subnet + ".1"))) {
