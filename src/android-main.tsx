@@ -6,6 +6,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AtlasApp } from "@/components/atlas-app";
 import { registerPlugin, SystemBars, SystemBarsStyle } from "@capacitor/core";
+/* 글꼴을 앱 안에서 불러온다(Google Fonts 접속 없음 → 개인정보처리방침 '외부 전송 없음'과 맞춤) */
+import "@fontsource/gowun-batang/400.css";
 import "./styles.css";
 import "./android-safe-area.css";
 
