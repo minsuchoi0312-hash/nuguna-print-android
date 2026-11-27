@@ -5,4 +5,6 @@
     <string name="share_label">누구나프린트로 인쇄</string>
     <string name="package_name">com.nuguna.print</string>
     <string name="custom_url_scheme">com.nuguna.print</string>
+    <!-- PDF 저장 뒤 잠깐 뜨는 안내 (%1$s = 폴더) -->
+    <string name="saved_to">%1$s에 저장했어요</string>
 </resources>

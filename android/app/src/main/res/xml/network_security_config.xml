@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  네트워크 보안 설정.
+  - 평문(HTTP)은 같은 와이파이의 복사기 · 내장 도우미(127.0.0.1)와 말하는 데 필요하다.
+    안드로이드 설정은 IP 대역(192.168.x 등)으로 제한할 수 없어서 기본값에서 평문을 허용한다.
+    앱은 인터넷 서버로 아무것도 보내지 않는다(개인정보처리방침 '외부 전송 없음').
+  - HTTPS는 시스템 인증서만 믿는다: 사용자가 깐 인증서로 가로채기(MITM)를 막는다.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

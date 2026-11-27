@@ -8,6 +8,7 @@ import { AtlasApp } from "@/components/atlas-app";
 import { registerPlugin, SystemBars, SystemBarsStyle } from "@capacitor/core";
 /* 글꼴을 앱 안에서 불러온다(Google Fonts 접속 없음 → 개인정보처리방침 '외부 전송 없음'과 맞춤) */
 import "@fontsource/gowun-batang/400.css";
+import { disableServiceWorker, installDownloads, installWebUsb } from "./android-native";
 import "./styles.css";
 import "./android-safe-area.css";
 
@@ -19,10 +20,11 @@ function syncSystemBars() {
 syncSystemBars();
 new MutationObserver(syncSystemBars).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-/* 앱 안에서는 서비스 워커(오프라인 캐시)를 쓰지 않는다 — 앱을 업데이트해도 예전 화면이 남는 것을 막는다 */
-if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
-  navigator.serviceWorker.register = () => Promise.reject(new Error("service worker disabled in app"));
-}
+/* 앱 안에서는 서비스 워커(오프라인 캐시)를 쓰지 않는다 — 예전 것도 지워 앱을 업데이트해도 옛 화면이 남지 않게.
+   USB OTG(navigator.usb)와 <a download> 저장은 네이티브(NugunaNativePrint)로 잇는다 — 화면을 그리기 전에. */
+disableServiceWorker();
+installWebUsb();
+installDownloads();
 
 /* ───── 폰 내장 프린터 도우미 (android/.../helper) ─────
  * PC 도우미와 같은 주소 · 응답이라 화면은 "도우미가 켜져 있다"고 보고 그대로 검색 · 9100 인쇄를 맡긴다. */

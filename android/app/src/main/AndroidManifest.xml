@@ -7,8 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- USB OTG 프린터(있으면 쓰고, 없는 폰도 설치 가능). 장치마다 화면에서 사용자 허락을 받는다 -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
 
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

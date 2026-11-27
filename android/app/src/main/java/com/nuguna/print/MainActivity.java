@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import androidx.activity.OnBackPressedCallback;
 
 import com.getcapacitor.BridgeActivity;
+import com.nuguna.print.helper.NugunaNativePrintPlugin;
 import com.nuguna.print.helper.PhoneHelperPlugin;
 import com.nuguna.print.helper.SharedInbox;
 
@@ -15,6 +16,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         /* 폰 안의 프린터 도우미(같은 와이파이 검색 · 9100 전송) */
         registerPlugin(PhoneHelperPlugin.class);
+        /* USB OTG 인쇄 · 파일 저장 (화면이 navigator.usb · <a download> 대신 쓴다) */
+        registerPlugin(NugunaNativePrintPlugin.class);
         super.onCreate(savedInstanceState);
 
         /* 뒤로가기: 화면(window.__nugunaBack)에 먼저 묻는다 — 열린 창 닫기 → 이전 화면 → 홈에서는 두 번 눌러 종료.

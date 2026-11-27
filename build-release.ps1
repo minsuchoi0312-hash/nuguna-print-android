@@ -13,7 +13,9 @@ if (-not (Test-Path "C:\dev\nuguna-print-keystore\keystore.properties")) {
 
 # 원본의 화면 코드를 가져온다 (원본은 읽기만)
 robocopy "$src\src" "$dst\src" /E /XF android-main.tsx /NFL /NDL /NJH /NJS /NP | Out-Null
-robocopy "$src\public" "$dst\public" /E /NFL /NDL /NJH /NJS /NP | Out-Null
+# 웹 전용 파일(__grok 설치 안내, 서비스 워커, 공유 미리보기 그림)은 앱에 싣지 않는다
+robocopy "$src\public" "$dst\public" /E /XD __grok /XF sw.js og.jpg /NFL /NDL /NJH /NJS /NP | Out-Null
+foreach ($web in "__grok", "sw.js", "og.jpg") { if (Test-Path "$dst\public\$web") { Remove-Item "$dst\public\$web" -Recurse -Force } }
 
 Set-Location $dst
 npx vite build --config vite.android.config.ts
