@@ -6,8 +6,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AtlasApp } from "@/components/atlas-app";
 import { registerPlugin, SystemBars, SystemBarsStyle } from "@capacitor/core";
-/* 글꼴을 앱 안에서 불러온다(Google Fonts 접속 없음 → 개인정보처리방침 '외부 전송 없음'과 맞춤) */
-import "@fontsource/gowun-batang/400.css";
+/* 글꼴: Pretendard 만 앱에 넣는다(styles.css). Gowun Batang(--font-display)은 브라우저 인쇄(window.print) 표지 제목에만 쓰이는데
+   앱 WebView는 window.print 를 쓰지 않으므로 빼서 용량을 줄인다 — 없으면 Pretendard 로 대신 그린다. 외부 글꼴 접속은 여전히 없다. */
 import { disableServiceWorker, installDownloads, installWebUsb } from "./android-native";
 import "./styles.css";
 import "./android-safe-area.css";

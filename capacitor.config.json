@@ -4,8 +4,7 @@
   "webDir": "dist-android",
   "loggingBehavior": "none",
   "server": {
-    "androidScheme": "http",
-    "cleartext": true
+    "androidScheme": "http"
   },
   "android": {
     "backgroundColor": "#17171C"

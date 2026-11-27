@@ -22,6 +22,16 @@ public final class SharedInbox {
     private SharedInbox() {}
 
     static final int MAX_FILES = 20;
+    /** 한 파일 상한 — 도우미가 흘려 보낼 때도 같은 값으로 다시 막는다(HelperServer.MAX_SHARED_BYTES) */
+    static final long MAX_BYTES = 48L * 1024 * 1024;
+
+    /** 표시 · 저장용 파일 이름: 경로(/ \ ..)와 제어 문자를 지우고 줄인다 */
+    static String safeName(String raw) {
+        String s = Net.clean(raw == null ? "" : raw, 200).replaceAll("[\\\\/:*?\"<>|]", "_").replaceAll("\\.{2,}", ".");
+        s = s.replaceAll("^[.\\s]+", "").trim();
+        if (s.isEmpty()) s = "shared";
+        return s.length() > 120 ? s.substring(0, 120) : s;
+    }
 
     /* 받는 파일 종류: 사진(jpeg · png · webp · gif · heic · bmp) · PDF · 글. SVG처럼 스크립트를 품을 수 있는 형식은 뺀다 */
     static final java.util.regex.Pattern ALLOWED_MIME = java.util.regex.Pattern.compile(
@@ -85,7 +95,9 @@ public final class SharedInbox {
                 }
             } catch (Exception ignored) {
             }
-            next.add(new Item(u, Net.clean(name, 120), mime, size));
+            /* 크기를 알려 준 파일이 상한보다 크면 처음부터 받지 않는다(모르는 크기는 보낼 때 상한으로 막는다) */
+            if (size > MAX_BYTES) continue;
+            next.add(new Item(u, safeName(name), mime, size));
         }
         if (next.isEmpty()) return false;
         items.clear();

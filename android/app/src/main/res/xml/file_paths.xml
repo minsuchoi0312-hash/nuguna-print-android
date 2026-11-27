@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- FileProvider가 내줄 수 있는 범위: 앱 캐시 폴더만 (외부 저장소 전체를 가리키지 않게) -->
+<!-- FileProvider가 내줄 수 있는 범위: 앱 캐시의 share/ 폴더 하나만 (안드로이드 10 미만에서 'PDF로 저장'을 공유 창으로 넘길 때).
+     파일은 다음 실행 때 지운다(NugunaNativePrintPlugin.cleanShare). -->
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <cache-path name="my_cache_images" path="." />
+    <cache-path name="share" path="share/" />
 </paths>

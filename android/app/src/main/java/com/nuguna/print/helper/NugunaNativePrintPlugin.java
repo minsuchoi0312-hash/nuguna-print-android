@@ -73,8 +73,21 @@ public class NugunaNativePrintPlugin extends Plugin {
         }
     }
 
+    /** FileProvider 로 내주는 유일한 폴더(res/xml/file_paths.xml 의 share/) */
+    private static final String SHARE_DIR = "share";
+
+    /** 지난 실행에서 공유 창으로 넘긴 임시 파일을 지운다(받는 앱이 이미 읽어 갔을 시점) */
+    private void cleanShare() {
+        File[] files = new File(getContext().getCacheDir(), SHARE_DIR).listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (!f.delete()) f.deleteOnExit();
+        }
+    }
+
     @Override
     public void load() {
+        cleanShare();
         usb = (UsbManager) getContext().getSystemService(Context.USB_SERVICE);
         receiver = new BroadcastReceiver() {
             @Override
@@ -440,7 +453,7 @@ public class NugunaNativePrintPlugin extends Plugin {
                 ret.put("where", "Download/NugunaPrint/" + name);
                 toast(getContext().getString(com.nuguna.print.R.string.saved_to, "Download/NugunaPrint"));
             } else {
-                File dir = new File(getContext().getCacheDir(), "export");
+                File dir = new File(getContext().getCacheDir(), SHARE_DIR);
                 if (!dir.exists() && !dir.mkdirs()) throw new IllegalStateException("mkdir");
                 File file = new File(dir, name);
                 try (FileOutputStream out = new FileOutputStream(file)) {
