@@ -13,8 +13,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         /* 릴리스마다 올린다 (스토어 업데이트는 versionCode가 커야 받아 준다): 3.2 → 32 */
-        versionCode 42
-        versionName "4.2"
+        versionCode 43
+        versionName "4.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -40,6 +40,10 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            /* APK에 META-INF/version-control-info.textproto(로컬 Git 정보)를 넣지 않는다 */
+            vcsInfo {
+                include false
+            }
         }
     }
 }
