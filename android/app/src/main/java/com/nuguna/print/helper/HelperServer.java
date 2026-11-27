@@ -300,9 +300,14 @@ public final class HelperServer {
             return;
         }
         switch (req.path) {
-            case "/status":
-                send(out, 200, Status.check(host, !"0".equals(val(req, "pjl"))));
+            case "/status": {
+                JSONObject st = Status.check(host, !"0".equals(val(req, "pjl")));
+                /* 앱에서 연결한 9100 프린터는 시스템 인쇄(설정 → 인쇄 → 누구나프린트)에도 바로 보이게 */
+                JSONObject caps = st.optJSONObject("capabilities");
+                if (caps != null && caps.optBoolean("raw9100")) com.nuguna.print.printservice.KnownPrinters.remember(ctx, host, st.optString("model"));
+                send(out, 200, st);
                 return;
+            }
             case "/probe": {
                 long t = System.currentTimeMillis();
                 boolean open = Net.portOpen(host, port, 800);
@@ -386,6 +391,7 @@ public final class HelperServer {
         } finally {
             Net.closeQuietly(printer);
         }
+        if (sent == req.length) com.nuguna.print.printservice.KnownPrinters.remember(ctx, host, "");
         JSONObject o = new JSONObject();
         o.put("ok", sent == req.length);
         o.put("bytes", sent);

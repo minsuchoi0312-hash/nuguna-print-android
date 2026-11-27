@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 시스템 인쇄 설정에서 '누구나프린트' 옆 메뉴(설정)를 누르면 앱이 열린다 -->
+<print-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.nuguna.print.MainActivity" />

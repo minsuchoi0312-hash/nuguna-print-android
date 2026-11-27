@@ -7,4 +7,6 @@
     <string name="custom_url_scheme">com.nuguna.print</string>
     <!-- PDF 저장 뒤 잠깐 뜨는 안내 (%1$s = 폴더) -->
     <string name="saved_to">%1$s에 저장했어요</string>
+    <!-- 설정 → 인쇄 목록에 보일 이름 -->
+    <string name="print_service_label">누구나프린트</string>
 </resources>

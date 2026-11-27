@@ -70,6 +70,21 @@
 
         </activity>
 
+        <!-- 시스템 인쇄 서비스: 설정 → 인쇄(삼성: 모든 프린터 → 프린터 추가)에 누구나프린트로 보인다.
+             다른 앱의 인쇄로 받은 문서를 폰에서 흑백 PCL 래스터로 바꿔 같은 와이파이 복사기 9100 으로 보낸다 -->
+        <service
+            android:name=".printservice.NugunaPrintService"
+            android:label="@string/print_service_label"
+            android:permission="android.permission.BIND_PRINT_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.printservice.PrintService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.printservice"
+                android:resource="@xml/printservice" />
+        </service>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
