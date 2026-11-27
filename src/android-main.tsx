@@ -8,7 +8,7 @@ import { AtlasApp } from "@/components/atlas-app";
 import { registerPlugin, SystemBars, SystemBarsStyle } from "@capacitor/core";
 /* 글꼴: Pretendard 만 앱에 넣는다(styles.css). Gowun Batang(--font-display)은 브라우저 인쇄(window.print) 표지 제목에만 쓰이는데
    앱 WebView는 window.print 를 쓰지 않으므로 빼서 용량을 줄인다 — 없으면 Pretendard 로 대신 그린다. 외부 글꼴 접속은 여전히 없다. */
-import { disableServiceWorker, installDownloads, installWebUsb } from "./android-native";
+import { disableServiceWorker, installDownloads, installQrShare, installWebUsb, pullLink } from "./android-native";
 import "./styles.css";
 import "./android-safe-area.css";
 
@@ -25,6 +25,7 @@ new MutationObserver(syncSystemBars).observe(document.documentElement, { attribu
 disableServiceWorker();
 installWebUsb();
 installDownloads();
+installQrShare();
 
 /* ───── 폰 내장 프린터 도우미 (android/.../helper) ─────
  * PC 도우미와 같은 주소 · 응답이라 화면은 "도우미가 켜져 있다"고 보고 그대로 검색 · 9100 인쇄를 맡긴다. */
@@ -134,4 +135,5 @@ void startPhoneHelper().then(async (helper) => {
     </StrictMode>,
   );
   if (helper) void pullShared(helper);
+  void pullLink();
 });

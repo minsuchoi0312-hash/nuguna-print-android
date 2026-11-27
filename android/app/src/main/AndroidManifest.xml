@@ -59,6 +59,15 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
+            <!-- 프린터 연결 링크(공개 연결 페이지 connect.html 이 여는 nugunaprint://connect?ip=…&name=…).
+                 받은 값은 화면(connect-link.ts)이 다시 거른다 — 연결만 하고 인쇄는 하지 않는다 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="nugunaprint" android:host="connect" />
+            </intent-filter>
+
         </activity>
 
         <provider

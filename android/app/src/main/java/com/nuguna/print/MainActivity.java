@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import androidx.activity.OnBackPressedCallback;
 
 import com.getcapacitor.BridgeActivity;
+import com.nuguna.print.helper.LinkInbox;
 import com.nuguna.print.helper.NugunaNativePrintPlugin;
 import com.nuguna.print.helper.PhoneHelperPlugin;
 import com.nuguna.print.helper.SharedInbox;
@@ -40,15 +41,21 @@ public class MainActivity extends BridgeActivity {
 
         /* 다른 앱에서 '공유 → 누구나프린트'로 열렸으면 파일을 받아 둔다 (화면이 뜨면 스스로 가져간다) */
         SharedInbox.take(this, getIntent());
+        /* 프린터 연결 링크로 열렸으면 받아 둔다 (화면이 뜨면 takeLink 로 가져간다) */
+        LinkInbox.take(getIntent());
     }
 
-    /** 앱이 이미 켜져 있을 때 공유로 다시 열림 → 받아 두고 화면에 알린다 */
+    /** 앱이 이미 켜져 있을 때 공유 · 연결 링크로 다시 열림 → 받아 두고 화면에 알린다 */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        if (!SharedInbox.take(this, intent)) return;
         WebView web = getBridge() == null ? null : getBridge().getWebView();
+        if (LinkInbox.take(intent)) {
+            if (web != null) web.evaluateJavascript("(function(){try{window.__nugunaLink && window.__nugunaLink();}catch(e){}})()", null);
+            return;
+        }
+        if (!SharedInbox.take(this, intent)) return;
         if (web != null) web.evaluateJavascript("(function(){try{window.__nugunaShared && window.__nugunaShared();}catch(e){}})()", null);
     }
 

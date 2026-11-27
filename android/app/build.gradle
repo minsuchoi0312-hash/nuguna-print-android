@@ -13,8 +13,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         /* 릴리스마다 올린다 (스토어 업데이트는 versionCode가 커야 받아 준다): 3.2 → 32 */
-        versionCode 48
-        versionName "4.8"
+        versionCode 49
+        versionName "4.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -59,6 +59,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    /* QR 찍기: 구글 Play 서비스 코드 스캐너 — 카메라 화면은 Play 서비스가 맡고 앱은 QR 글자만 받는다(카메라 권한 없음) */
+    implementation "com.google.android.gms:play-services-code-scanner:16.1.0"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"

@@ -4,6 +4,8 @@
  * 1) navigator.usb: 안드로이드 WebView에는 WebUSB가 없다. NugunaNativePrint(UsbManager)로 같은 모양을 만들어
  *    웹의 USB 인쇄 코드(src/lib/discover.ts)가 그대로 돈다 — 장치 고르기 · GET_DEVICE_ID · Bulk OUT 전송.
  * 2) <a download>: WebView는 무시하므로 가로채서 '다운로드/NugunaPrint'에 저장한다(PDF 저장 · QR 카드 · 로그 백업).
+ * 4) QR 찍기 · 링크 공유 · 연결 링크: window.__nugunaScanQr · __nugunaShareText (웹 src/lib/qr-scan.ts 가 쓴다),
+ *    앱을 연 nugunaprint://connect 링크는 pullLink 가 화면(window.__nugunaApplyLink)에 넘긴다.
  * 3) 서비스 워커: 앱에서는 쓰지 않고, 예전에 등록된 것이 있으면 지운다(업데이트 후 옛 화면이 남지 않게).
  *
  * 이 파일은 안드로이드 사본에만 있다(build-*.ps1 이 원본 src 를 덮어써도 남는다).
@@ -41,6 +43,9 @@ type NativePrint = {
   usbClearHalt(o: { id: string; endpoint: number; direction: string }): Promise<void>;
   usbTransferOut(o: { id: string; endpoint: number; data: string }): Promise<{ status: string; bytesWritten: number }>;
   saveFile(o: { name: string; mime: string; data: string }): Promise<{ saved: boolean; where?: string; shared?: boolean }>;
+  scanQr(): Promise<{ text?: string; canceled?: boolean }>;
+  shareText(o: { text: string; title: string }): Promise<void>;
+  takeLink(): Promise<{ link: string }>;
   addListener(event: "usb", fn: (e: { type: "connect" | "disconnect"; device: NativeDevice }) => void): Promise<PluginListenerHandle>;
 };
 
@@ -271,5 +276,37 @@ export function disableServiceWorker() {
       .keys()
       .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
       .catch(() => {});
+  }
+}
+
+/* ───── 4) QR 찍기 · 링크 공유 · 연결 링크 ───── */
+
+export function installQrShare() {
+  const w = window as {
+    __nugunaScanQr?: () => Promise<{ text?: string; canceled?: boolean }>;
+    __nugunaShareText?: (text: string, title: string) => Promise<void>;
+    __nugunaLink?: () => void;
+  };
+  w.__nugunaScanQr = () => NativePrint.scanQr();
+  w.__nugunaShareText = (text, title) => NativePrint.shareText({ text, title });
+  w.__nugunaLink = () => void pullLink();
+}
+
+/** 화면의 링크 처리기가 준비될 때까지 기다린다 */
+function linkReady(): Promise<(text: string) => boolean> {
+  const host = window as { __nugunaApplyLink?: (text: string) => boolean };
+  if (host.__nugunaApplyLink) return Promise.resolve(host.__nugunaApplyLink);
+  return new Promise((resolve) => {
+    window.addEventListener("nuguna-link-ready", () => resolve(host.__nugunaApplyLink!), { once: true });
+  });
+}
+
+/** 앱을 연 프린터 연결 링크가 있으면 화면에 넘긴다(앱이 꺼져 있었을 때 · 켜져 있을 때 둘 다) */
+export async function pullLink() {
+  try {
+    const { link } = await NativePrint.takeLink();
+    if (link) (await linkReady())(link);
+  } catch {
+    /* 링크를 못 읽어도 앱은 평소처럼 연다 */
   }
 }

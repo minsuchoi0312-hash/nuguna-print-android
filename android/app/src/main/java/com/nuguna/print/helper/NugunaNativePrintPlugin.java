@@ -30,6 +30,10 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanner;
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions;
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -414,6 +418,60 @@ public class NugunaNativePrintPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("status", sent > 0 || data.length == 0 ? "ok" : "stall");
         ret.put("bytesWritten", sent);
+        call.resolve(ret);
+    }
+
+    /* ───── QR 찍기 · 링크 공유 · 연결 링크 ───── */
+
+    /** 구글 Play 서비스 코드 스캐너로 QR 하나 읽기. 카메라 화면은 Play 서비스가 띄우고 앱은 글자만 받는다(카메라 권한 없음).
+     *  { text } · 닫으면 { canceled: true } · Play 서비스가 없거나 모듈을 못 받으면 reject */
+    @PluginMethod
+    public void scanQr(PluginCall call) {
+        if (getActivity() == null) {
+            call.reject("no activity");
+            return;
+        }
+        GmsBarcodeScannerOptions options = new GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .build();
+        GmsBarcodeScanner scanner = GmsBarcodeScanning.getClient(getActivity(), options);
+        scanner.startScan()
+            .addOnSuccessListener(code -> {
+                JSObject ret = new JSObject();
+                String text = code.getRawValue();
+                ret.put("text", text == null ? "" : (text.length() > 4000 ? text.substring(0, 4000) : text));
+                call.resolve(ret);
+            })
+            .addOnCanceledListener(() -> {
+                JSObject ret = new JSObject();
+                ret.put("canceled", true);
+                call.resolve(ret);
+            })
+            .addOnFailureListener(e -> call.reject("scan failed"));
+    }
+
+    /** 안드로이드 공유 창으로 글(링크) 보내기 — 카톡 · 문자 · 메일 등 */
+    @PluginMethod
+    public void shareText(PluginCall call) {
+        String text = call.getString("text", "");
+        String title = call.getString("title", "");
+        if (text == null || text.isEmpty() || text.length() > 4000) {
+            call.reject("bad text");
+            return;
+        }
+        Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
+        if (title != null && !title.isEmpty()) send.putExtra(Intent.EXTRA_SUBJECT, title);
+        Intent chooser = Intent.createChooser(send, title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(chooser);
+        call.resolve();
+    }
+
+    /** 앱을 연 프린터 연결 링크(nugunaprint://connect?…)를 한 번 꺼내 간다. 없으면 { link: "" } */
+    @PluginMethod
+    public void takeLink(PluginCall call) {
+        String link = LinkInbox.takePending();
+        JSObject ret = new JSObject();
+        ret.put("link", link == null ? "" : link);
         call.resolve(ret);
     }
 
