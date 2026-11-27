@@ -151,7 +151,7 @@ public final class HelperServer {
                 route(req, out);
             } catch (Exception e) {
                 /* 내부 예외 문구는 밖으로 내보내지 않는다 */
-                Log.w(TAG, "request failed: " + e);
+                Log.w(TAG, "request failed: " + e.getClass().getSimpleName()); // 주소 · 파일 이름이 로그에 남지 않게
                 send(out, 502, err("helper error"));
             }
         } catch (Exception ignored) {

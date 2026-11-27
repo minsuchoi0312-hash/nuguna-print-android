@@ -22,6 +22,22 @@ function woff2Only(): Plugin {
   };
 }
 
+/**
+ * 앱은 Pretendard(글자 범위별 woff2 92개, 약 3MB)를 싣지 않고 폰 기본 글꼴로 그린다.
+ * styles.css 의 글꼴 목록이 Roboto · Noto Sans · Noto Sans CJK KR … 로 이어지므로 화면 · 인쇄 캔버스 모두 폰 글꼴을 쓴다.
+ * 웹 빌드(vite.config.ts)는 그대로 Pretendard 를 쓴다.
+ */
+function noPretendard(): Plugin {
+  return {
+    name: "nuguna-no-pretendard",
+    enforce: "pre",
+    transform(code, id) {
+      if (!/[\\/]src[\\/]styles\.css(\?.*)?$/.test(id)) return null;
+      return { code: code.replace(/^@import\s+["']pretendard\/[^"']+["'];\s*$/m, ""), map: null };
+    },
+  };
+}
+
 export default defineConfig({
   root: ".",
   base: "./",
@@ -29,7 +45,7 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  plugins: [woff2Only(), tailwindcss(), viteReact()],
+  plugins: [noPretendard(), woff2Only(), tailwindcss(), viteReact()],
   build: {
     outDir: "dist-android",
     emptyOutDir: true,

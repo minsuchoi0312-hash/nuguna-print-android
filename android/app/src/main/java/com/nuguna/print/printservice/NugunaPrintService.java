@@ -52,6 +52,15 @@ public class NugunaPrintService extends PrintService {
     /** 6mm = 236 mil — 이 안쪽은 비운다 (PclRaster.EDGE 와 같다) */
     private static final int MARGIN_MILS = 236;
     private static final long MAX_PDF_BYTES = 120L * 1024 * 1024;
+    /** 한 번에 그리는 쪽 수 상한 — 아주 긴 문서로 폰이 오래 묶이지 않게 (앱의 PDF 쪽 고르기와 같은 500쪽) */
+    private static final int MAX_PAGES = 500;
+
+    /** 쪽 수가 너무 많을 때 — 따로 안내한다 */
+    private static final class TooManyPages extends IOException {
+        TooManyPages() {
+            super("too many pages");
+        }
+    }
 
     private final Handler main = new Handler(Looper.getMainLooper());
     private final ExecutorService jobs = Executors.newSingleThreadExecutor();
@@ -121,7 +130,9 @@ public class NugunaPrintService extends PrintService {
             if (!cancel) KnownPrinters.remember(this, host, "");
         } catch (Throwable e) { // 메모리 부족(큰 용지)도 앱이 꺼지지 않고 작업 실패로
             Log.w(TAG, "print failed: " + e.getClass().getSimpleName());
-            fail = e instanceof java.net.ConnectException || e instanceof java.net.SocketTimeoutException || e instanceof java.net.NoRouteToHostException
+            fail = e instanceof TooManyPages
+                ? "한 번에 " + MAX_PAGES + "쪽까지 인쇄할 수 있어요. 쪽 범위를 나눠서 인쇄해 주세요."
+                : e instanceof java.net.ConnectException || e instanceof java.net.SocketTimeoutException || e instanceof java.net.NoRouteToHostException
                 ? "복사기에 연결하지 못했어요. 같은 와이파이인지 확인해 주세요."
                 : "인쇄하지 못했어요. 누구나프린트 앱에서 다시 해 보세요.";
         } finally {
@@ -160,6 +171,7 @@ public class NugunaPrintService extends PrintService {
              PdfRenderer renderer = new PdfRenderer(fd)) {
             int pages = renderer.getPageCount();
             if (pages < 1) throw new IOException("empty document");
+            if (pages > MAX_PAGES) throw new TooManyPages();
             Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             Socket printer = Net.connect(host, 9100, 5000);
             try {
