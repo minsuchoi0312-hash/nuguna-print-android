@@ -48,6 +48,16 @@
                 <data android:mimeType="image/*" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>
+            <!-- 다른 앱(카카오톡 · 메신저 · 파일 앱)의 '연결 앱 · 다른 앱으로 열기'에서 누구나프린트 고르기.
+                 content:// 만 받는다(file:// 은 SharedInbox 에서도 거절) -->
+            <intent-filter android:label="@string/share_label">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/pdf" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
 
         </activity>
 

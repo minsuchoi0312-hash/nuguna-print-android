@@ -66,6 +66,10 @@ public final class SharedInbox {
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             ArrayList<Uri> many = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
             if (many != null) uris.addAll(many);
+        } else if (Intent.ACTION_VIEW.equals(action)) {
+            /* '연결 앱 · 다른 앱으로 열기': 파일 주소가 EXTRA_STREAM 이 아니라 getData() 에 온다 */
+            Uri one = intent.getData();
+            if (one != null) uris.add(one);
         } else {
             return false;
         }
