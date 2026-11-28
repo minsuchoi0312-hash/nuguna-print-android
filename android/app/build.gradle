@@ -13,8 +13,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         /* 릴리스마다 올린다 (스토어 업데이트는 versionCode가 커야 받아 준다): 3.2 → 32 */
-        versionCode 57
-        versionName "5.7"
+        versionCode 58
+        versionName "5.8"
         /* 앱 화면 언어(한국어 · 영어 · 일본어 · 중국어)만 남겨 AndroidX 의 다른 언어 문자열을 뺀다 */
         resourceConfigurations += ["ko", "en", "ja", "zh"]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
