@@ -9,8 +9,12 @@
     <!-- 글꼴은 앱 안에 넣어 둔다(@fontsource) — 외부 서버(Google Fonts)로 아무것도 보내지 않으려고 -->
     <script>
       try {
+        /* 밝기(system이면 폰 설정) · 밝기별 색 테마 — src/lib/palette.ts APPEARANCE_BOOT 와 같게 */
         var t = localStorage.getItem("atlas-theme");
-        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        if (t !== "light" && t !== "dark") t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        document.documentElement.dataset.theme = t;
+        var p = localStorage.getItem("atlas-palette-" + t) || localStorage.getItem("atlas-palette");
+        if (p && p !== "blue") document.documentElement.dataset.palette = p;
         var c = t === "light" ? "#F2F4F6" : "#17171C";
         document.querySelectorAll("meta[name=theme-color]").forEach(function (m) { m.setAttribute("content", c); });
       } catch (e) {}
